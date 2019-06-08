@@ -24,21 +24,6 @@ type action =
 
 let document = Webapi.Dom.Document.asEventTarget(Webapi.Dom.document);
 
-let clearSelection: unit => unit =
-  () => [%bs.raw
-    {|window.getSelection && window.getSelection().removeAllRanges()|}
-  ];
-
-let clamp = (min: option(int), max: option(int), value: int) =>
-  switch (min, max, value) {
-  | (_, Some(max), _) when value > max => max
-  | (Some(min), _, _) when value < min => min
-  | _ => value
-  };
-
-[@bs.deriving abstract]
-type ref = {current: Dom.element};
-
 type callback = int => unit;
 
 let callOnDrag = (onDrag, size) =>
@@ -59,9 +44,8 @@ let make =
       ~onDrag: option(callback)=?,
       ~onDragEnd: option(callback)=?,
     ) => {
-  let paneRef: ref = [%bs.raw {|React.useRef(null)|}];
-  // ReasonML JSX wants a different type, so we use this hack.
-  let paneRefForJSX: ReactDOMRe.domRef = [%bs.raw {|paneRef|}];
+  let paneRef: React.Ref.t(Js.Nullable.t(Webapi.Dom.Element.t)) =
+    React.useRef(Js.Nullable.null);
   let (state, dispatch) =
     React.useReducer(
       (state, action) =>
@@ -70,13 +54,19 @@ let make =
             ...state,
             dragging: true,
             initialX: x,
-            initialWidth:
-              Webapi.Dom.Element.clientWidth(currentGet(paneRef)),
+            initialWidth: {
+              let optionCurrent =
+                Js.Nullable.toOption(React.Ref.current(paneRef));
+              switch (optionCurrent) {
+              | Some(current) => Webapi.Dom.Element.clientWidth(current)
+              | None => 0
+              };
+            },
           }
         | MouseMove(x) => {
             ...state,
             width:
-              clamp(
+              Utils.clamp(
                 minWidth,
                 maxWidth,
                 state.initialWidth + state.initialX - x,
@@ -96,7 +86,7 @@ let make =
         };
         let onMove = (e: Dom.mouseEvent) => {
           callOnDrag(onDrag, state.width);
-          clearSelection();
+          Utils.clearSelection();
           dispatch(MouseMove(pageX(e)));
         };
         addMouseMoveEventListener(onMove, document);
@@ -117,7 +107,7 @@ let make =
     React.useCallback2(
       e => {
         callOnDrag(onDragStart, state.width);
-        clearSelection();
+        Utils.clearSelection();
         dispatch(MouseDown(ReactEvent.Mouse.pageX(e)));
       },
       (dispatch, state.width),
@@ -137,6 +127,8 @@ let make =
     prefix(addDraggingIfDragging(dragging, c));
   };
 
+  let refForJsx = ReactDOMRe.Ref.domRef(paneRef);
+
   <div className=classPrefix>
     <div className={getClass("pane", state.dragging)}>
       <div className={getClass("pane-inner", state.dragging)}>
@@ -145,7 +137,7 @@ let make =
     </div>
     <div className={getClass("handle", state.dragging)} onMouseDown />
     <div
-      ref=paneRefForJSX
+      ref=refForJsx
       className={getClass("pane", state.dragging)}
       style={ReactDOMRe.Style.make(~width=finalWidth, ~flex="unset", ())}>
       <div className={getClass("pane-inner", state.dragging)}>
