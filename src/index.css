@@ -13,8 +13,6 @@
 /* Panels. */
 
 .splitterer > div:nth-child(odd) {
-    border: 1px solid #ddd;
-    border-radius: 2px;
     box-sizing: border-box;
     flex: 1;
     position: relative;
@@ -28,23 +26,45 @@
     left: 0;
     right: 0;
     overflow: auto;
-    padding: 20px;
 }
 
 /* Handle. */
 
 .splitterer > div:nth-child(even) {
+    --size: 11px;
+    --border-size: calc((var(--size) - 1px) * 0.5);
     box-sizing: border-box;
+    background-clip: padding-box;
+    z-index: 1;
+    margin: calc(var(--size) * -0.5);
+    background-color: rgba(0, 0, 0, 0.5);
+    border: solid rgba(0, 0, 0, 0);
 }
 
 .splitterer--horizontal > div:nth-child(even) {
-    width: 5px;
+    width: var(--size);
+    margin-top: 0;
+    margin-bottom: 0;
+    border-width: 0 var(--border-size);
     cursor: ew-resize;
 }
 
+.splitterer--horizontal > div:nth-child(even):hover {
+    border: solid rgba(0, 0, 0, 0.25);
+    border-width: 0 var(--border-size);
+}
+
 .splitterer--vertical > div:nth-child(even) {
-    height: 5px;
+    height: var(--size);
+    margin-left: 0;
+    margin-right: 0;
+    border-width: var(--border-size) 0;
     cursor: ns-resize;
+}
+
+.splitterer--vertical > div:nth-child(even):hover {
+    border: solid rgba(0, 0, 0, 0.25);
+    border-width: var(--border-size) 0;
 }
 
 .splitterer--dragging.splitterer--horizontal > div:nth-child(even) {

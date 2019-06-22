@@ -9,7 +9,8 @@ var initialState = /* record */[
   /* dragging */false,
   /* initialMousePosition */0,
   /* initialSize */0,
-  /* size */100,
+  /* size */0,
+  /* measured */false,
   /* documentCursor */undefined
 ];
 
@@ -49,7 +50,8 @@ function Split(Props) {
                     /* initialMousePosition */state[/* initialMousePosition */1],
                     /* initialSize */state[/* initialSize */2],
                     /* size */state[/* size */3],
-                    /* documentCursor */state[/* documentCursor */4]
+                    /* measured */state[/* measured */4],
+                    /* documentCursor */state[/* documentCursor */5]
                   ];
           } else if (action.tag) {
             return /* record */[
@@ -57,23 +59,25 @@ function Split(Props) {
                     /* initialMousePosition */state[/* initialMousePosition */1],
                     /* initialSize */state[/* initialSize */2],
                     /* size */Utils$ReactHooksTemplate.clamp(minSize, maxSize, (state[/* initialSize */2] + state[/* initialMousePosition */1] | 0) - action[0] | 0),
-                    /* documentCursor */state[/* documentCursor */4]
+                    /* measured */state[/* measured */4],
+                    /* documentCursor */state[/* documentCursor */5]
                   ];
           } else {
             var optionCurrent = paneRef.current;
-            var tmp;
+            var initialSize;
             if (optionCurrent == null) {
-              tmp = 0;
+              initialSize = 0;
             } else {
               var match = direction === "horizontal";
-              tmp = match ? optionCurrent.clientWidth : optionCurrent.clientHeight;
+              initialSize = match ? optionCurrent.clientWidth : optionCurrent.clientHeight;
             }
             return /* record */[
                     /* dragging */true,
                     /* initialMousePosition */action[0],
-                    /* initialSize */tmp,
-                    /* size */state[/* size */3],
-                    /* documentCursor */state[/* documentCursor */4]
+                    /* initialSize */initialSize,
+                    /* size */initialSize,
+                    /* measured */true,
+                    /* documentCursor */state[/* documentCursor */5]
                   ];
           }
         }), initialState);
@@ -103,7 +107,7 @@ function Split(Props) {
           
         }), /* tuple */[
         state[/* dragging */0],
-        state[/* documentCursor */4],
+        state[/* documentCursor */5],
         dispatch,
         state[/* size */3]
       ]);
@@ -122,12 +126,16 @@ function Split(Props) {
   var baseClassName = match$6 ? className + (" " + classNameHorizontal) : className + (" " + classNameVertical);
   var match$7 = state[/* dragging */0];
   var joinedClassNames = match$7 ? baseClassName + (" " + classNameDragging) : baseClassName;
-  var sizeStyle = direction === "horizontal" ? ({
-        width: finalSize,
-        flex: "unset"
-      }) : ({
-        height: finalSize,
-        flex: "unset"
+  var sizeStyle = state[/* measured */4] ? (
+      direction === "horizontal" ? ({
+            width: finalSize,
+            flex: "unset"
+          }) : ({
+            height: finalSize,
+            flex: "unset"
+          })
+    ) : ({
+        flex: "1"
       });
   return React.createElement("div", {
               className: joinedClassNames

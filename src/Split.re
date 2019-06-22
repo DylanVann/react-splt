@@ -6,6 +6,7 @@ type state = {
   initialMousePosition: int,
   initialSize: int,
   size: int,
+  measured: bool,
   documentCursor: option(string),
 };
 
@@ -13,7 +14,8 @@ let initialState: state = {
   dragging: false,
   initialMousePosition: 0,
   initialSize: 0,
-  size: 100,
+  size: 0,
+  measured: false,
   documentCursor: None,
 };
 
@@ -55,22 +57,26 @@ let make =
     React.useReducer(
       (state, action) =>
         switch (action) {
-        | MouseDown(x) => {
+        | MouseDown(x) =>
+          let initialSize = {
+            let optionCurrent =
+              Js.Nullable.toOption(React.Ref.current(paneRef));
+            switch (optionCurrent) {
+            | Some(current) =>
+              direction == "horizontal"
+                ? Webapi.Dom.Element.clientWidth(current)
+                : Webapi.Dom.Element.clientHeight(current)
+            | None => 0
+            };
+          };
+          {
             ...state,
             dragging: true,
             initialMousePosition: x,
-            initialSize: {
-              let optionCurrent =
-                Js.Nullable.toOption(React.Ref.current(paneRef));
-              switch (optionCurrent) {
-              | Some(current) =>
-                direction == "horizontal"
-                  ? Webapi.Dom.Element.clientWidth(current)
-                  : Webapi.Dom.Element.clientHeight(current)
-              | None => 0
-              };
-            },
-          }
+            measured: true,
+            initialSize,
+            size: initialSize,
+          };
         | MouseMove(x) => {
             ...state,
             size:
@@ -142,7 +148,9 @@ let make =
     state.dragging ? baseClassName ++ " " ++ classNameDragging : baseClassName;
 
   let sizeStyle =
-    if (direction == "horizontal") {
+    if (!state.measured) {
+      ReactDOMRe.Style.make(~flex="1", ());
+    } else if (direction == "horizontal") {
       ReactDOMRe.Style.make(~width=finalSize, ~flex="unset", ());
     } else {
       ReactDOMRe.Style.make(~height=finalSize, ~flex="unset", ());
