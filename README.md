@@ -2,7 +2,24 @@
 
 A tiny (1kb) React component for split panes (written in ReasonML).
 
-## Run Project
+## Usage
+
+```js
+import { Split } from 'react-splt'
+
+function MyComponent() {
+    return (
+        <Split>
+            <span>Left pane.</span>
+            <span>Right pane.</span>
+        </Split>
+    )
+}
+```
+
+See the Storybook for more examples.
+
+## Developing
 
 ```sh
 # Install dependencies.
