@@ -8,7 +8,7 @@ A tiny (1kb) React component for split panes (written in ReasonML).
 yarn add react-splt
 ```
 
-```js
+```jsx
 import { Split } from 'react-splt'
 
 function MyComponent() {
