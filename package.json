@@ -20,7 +20,10 @@
     "source": "src/Split.bs.js",
     "types": "src/index.d.ts",
     "scripts": {
-        "build": "bsb -make-world && rollup -c",
+        "build": "build:reason && build:bundle && build:storybook",
+        "build:reason": "bsb -make-world",
+        "build:bundle": "rollup -c",
+        "build:storybook": "build-storybook -c .storybook -o build",
         "clean": "bsb -clean-world",
         "start": "bsb -make-world -w",
         "storybook": "start-storybook",
