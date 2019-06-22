@@ -31,8 +31,13 @@ function Split(Props) {
   var onDragStart = Props.onDragStart;
   var onDrag = Props.onDrag;
   var onDragEnd = Props.onDragEnd;
+  Props.direction;
+  var match = Props.className;
+  var className = match !== undefined ? match : "splitterer";
+  var match$1 = Props.classNameDragging;
+  var classNameDragging = match$1 !== undefined ? match$1 : "splitterer--dragging";
   var paneRef = React.useRef(null);
-  var match = React.useReducer((function (state, action) {
+  var match$2 = React.useReducer((function (state, action) {
           if (typeof action === "number") {
             return /* record */[
                     /* dragging */false,
@@ -60,8 +65,8 @@ function Split(Props) {
                   ];
           }
         }), initialState);
-  var dispatch = match[1];
-  var state = match[0];
+  var dispatch = match$2[1];
+  var state = match$2[0];
   React.useEffect((function (param) {
           if (state[/* dragging */0]) {
             var onUp = function (_e) {
@@ -97,36 +102,19 @@ function Split(Props) {
         state[/* width */3]
       ]);
   var finalWidth = width !== undefined ? String(width) + "px" : String(state[/* width */3]) + "px";
-  var classPrefix = "splitterer";
-  var prefix = function (c) {
-    return classPrefix + ("__" + c);
-  };
-  var addDraggingIfDragging = function (dragging, c) {
-    if (dragging) {
-      return c + (" " + (c + "--dragging"));
-    } else {
-      return c;
-    }
-  };
+  var match$3 = state[/* dragging */0];
+  var joinedClassNames = match$3 ? className + (" " + classNameDragging) : className;
   return React.createElement("div", {
-              className: classPrefix
-            }, React.createElement("div", {
-                  className: prefix(addDraggingIfDragging(state[/* dragging */0], "pane"))
-                }, React.createElement("div", {
-                      className: prefix(addDraggingIfDragging(state[/* dragging */0], "pane-inner"))
-                    }, children[0])), React.createElement("div", {
-                  className: prefix(addDraggingIfDragging(state[/* dragging */0], "handle")),
+              className: joinedClassNames
+            }, React.createElement("div", undefined, React.createElement("div", undefined, children[0])), React.createElement("div", {
                   onMouseDown: onMouseDown
                 }), React.createElement("div", {
                   ref: paneRef,
-                  className: prefix(addDraggingIfDragging(state[/* dragging */0], "pane")),
                   style: {
                     width: finalWidth,
                     flex: "unset"
                   }
-                }, React.createElement("div", {
-                      className: prefix(addDraggingIfDragging(state[/* dragging */0], "pane-inner"))
-                    }, children[1])));
+                }, React.createElement("div", undefined, children[1])));
 }
 
 var make = Split;

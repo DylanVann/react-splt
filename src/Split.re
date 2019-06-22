@@ -32,6 +32,10 @@ let callOnDrag = (onDrag, size) =>
   | None => ()
   };
 
+type direction =
+  | Horizontal
+  | Vertical;
+
 [@react.component]
 [@genType]
 let make =
@@ -43,6 +47,9 @@ let make =
       ~onDragStart: option(callback)=?,
       ~onDrag: option(callback)=?,
       ~onDragEnd: option(callback)=?,
+      ~direction=Horizontal,
+      ~className="splitterer",
+      ~classNameDragging="splitterer--dragging",
     ) => {
   let paneRef: React.Ref.t(Js.Nullable.t(Webapi.Dom.Element.t)) =
     React.useRef(Js.Nullable.null);
@@ -119,30 +126,18 @@ let make =
     | None => string_of_int(state.width) ++ "px"
     };
 
-  let classPrefix = "splitterer";
-  let prefix = (c: string) => classPrefix ++ "__" ++ c;
-  let addDraggingIfDragging = (dragging: bool, c: string) =>
-    dragging ? c ++ " " ++ c ++ "--dragging" : c;
-  let getClass = (c: string, dragging: bool) => {
-    prefix(addDraggingIfDragging(dragging, c));
-  };
-
   let refForJsx = ReactDOMRe.Ref.domRef(paneRef);
 
-  <div className=classPrefix>
-    <div className={getClass("pane", state.dragging)}>
-      <div className={getClass("pane-inner", state.dragging)}>
-        {fst(children)}
-      </div>
-    </div>
-    <div className={getClass("handle", state.dragging)} onMouseDown />
+  let joinedClassNames =
+    state.dragging ? className ++ " " ++ classNameDragging : className;
+
+  <div className=joinedClassNames>
+    <div> <div> {fst(children)} </div> </div>
+    <div onMouseDown />
     <div
       ref=refForJsx
-      className={getClass("pane", state.dragging)}
       style={ReactDOMRe.Style.make(~width=finalWidth, ~flex="unset", ())}>
-      <div className={getClass("pane-inner", state.dragging)}>
-        {snd(children)}
-      </div>
+      <div> {snd(children)} </div>
     </div>
   </div>;
 };
