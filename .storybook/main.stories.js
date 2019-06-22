@@ -1,7 +1,7 @@
 import React from 'react'
 import { storiesOf } from '@storybook/react'
 import Slider from '../src'
-import '../src/index.css'
+import '../index.css'
 
 function BasicExample() {
     return (
