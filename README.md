@@ -4,6 +4,10 @@ A tiny (1kb) React component for split panes (written in ReasonML).
 
 ## Usage
 
+```sh
+yarn add react-splt
+```
+
 ```js
 import { Split } from 'react-splt'
 
