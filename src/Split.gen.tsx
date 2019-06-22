@@ -2,29 +2,23 @@
 /* eslint-disable import/first */
 
 
-const $$toRE996312600: { [key: string]: any } = {"Horizontal": 0, "Vertical": 1};
-
 // tslint:disable-next-line:no-var-requires
 const SplitBS = require('./Split.bs');
 
 // tslint:disable-next-line:interface-over-type-literal
 export type callback = (_1:number) => void;
 
-// tslint:disable-next-line:interface-over-type-literal
-export type direction = "Horizontal" | "Vertical";
-
 export const make: (_1:{
   readonly children: [JSX.Element, JSX.Element]; 
   readonly className?: string; 
   readonly classNameDragging?: string; 
-  readonly direction?: direction; 
-  readonly maxWidth?: number; 
-  readonly minWidth?: number; 
+  readonly classNameHorizontal?: string; 
+  readonly classNameVertical?: string; 
+  readonly direction?: string; 
+  readonly maxSize?: number; 
+  readonly minSize?: number; 
   readonly onDrag?: callback; 
   readonly onDragEnd?: callback; 
   readonly onDragStart?: callback; 
-  readonly width?: number
-}) => JSX.Element = function Split(Arg1: any) {
-  const result = SplitBS.make({children:Arg1.children, className:Arg1.className, classNameDragging:Arg1.classNameDragging, direction:(Arg1.direction == null ? undefined : $$toRE996312600[Arg1.direction]), maxWidth:Arg1.maxWidth, minWidth:Arg1.minWidth, onDrag:Arg1.onDrag, onDragEnd:Arg1.onDragEnd, onDragStart:Arg1.onDragStart, width:Arg1.width});
-  return result
-};
+  readonly size?: number
+}) => JSX.Element = SplitBS.make;

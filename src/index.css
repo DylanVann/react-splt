@@ -1,12 +1,21 @@
+/* The row. */
+
 .splitterer {
     flex: 1;
     display: flex;
     height: 200px;
 }
 
+.splitterer--vertical {
+    flex-direction: column;
+}
+
+/* Panels. */
+
 .splitterer > div:nth-child(odd) {
+    border: 1px solid #ddd;
+    border-radius: 2px;
     box-sizing: border-box;
-    background-color: aquamarine;
     flex: 1;
     position: relative;
     overflow: hidden;
@@ -22,13 +31,26 @@
     padding: 20px;
 }
 
+/* Handle. */
+
 .splitterer > div:nth-child(even) {
-    width: 10px;
-    background-color: brown;
     box-sizing: border-box;
+}
+
+.splitterer--horizontal > div:nth-child(even) {
+    width: 5px;
     cursor: ew-resize;
 }
 
-.splitterer--dragging > div:nth-child(even) {
+.splitterer--vertical > div:nth-child(even) {
+    height: 5px;
+    cursor: ns-resize;
+}
+
+.splitterer--dragging.splitterer--horizontal > div:nth-child(even) {
     cursor: col-resize;
+}
+
+.splitterer--dragging.splitterer--vertical > div:nth-child(even) {
+    cursor: row-resize;
 }

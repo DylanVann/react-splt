@@ -7,9 +7,9 @@ import * as Utils$ReactHooksTemplate from "./Utils.bs.js";
 
 var initialState = /* record */[
   /* dragging */false,
-  /* initialX */0,
-  /* initialWidth */0,
-  /* width */100,
+  /* initialMousePosition */0,
+  /* initialSize */0,
+  /* size */100,
   /* documentCursor */undefined
 ];
 
@@ -24,59 +24,73 @@ function callOnDrag(onDrag, size) {
 }
 
 function Split(Props) {
-  var width = Props.width;
-  var minWidth = Props.minWidth;
-  var maxWidth = Props.maxWidth;
+  var size = Props.size;
+  var minSize = Props.minSize;
+  var maxSize = Props.maxSize;
   var children = Props.children;
   var onDragStart = Props.onDragStart;
   var onDrag = Props.onDrag;
   var onDragEnd = Props.onDragEnd;
-  Props.direction;
-  var match = Props.className;
-  var className = match !== undefined ? match : "splitterer";
-  var match$1 = Props.classNameDragging;
-  var classNameDragging = match$1 !== undefined ? match$1 : "splitterer--dragging";
+  var match = Props.direction;
+  var direction = match !== undefined ? match : "horizontal";
+  var match$1 = Props.className;
+  var className = match$1 !== undefined ? match$1 : "splitterer";
+  var match$2 = Props.classNameDragging;
+  var classNameDragging = match$2 !== undefined ? match$2 : "splitterer--dragging";
+  var match$3 = Props.classNameVertical;
+  var classNameVertical = match$3 !== undefined ? match$3 : "splitterer--vertical";
+  var match$4 = Props.classNameHorizontal;
+  var classNameHorizontal = match$4 !== undefined ? match$4 : "splitterer--horizontal";
   var paneRef = React.useRef(null);
-  var match$2 = React.useReducer((function (state, action) {
+  var match$5 = React.useReducer((function (state, action) {
           if (typeof action === "number") {
             return /* record */[
                     /* dragging */false,
-                    /* initialX */state[/* initialX */1],
-                    /* initialWidth */state[/* initialWidth */2],
-                    /* width */state[/* width */3],
+                    /* initialMousePosition */state[/* initialMousePosition */1],
+                    /* initialSize */state[/* initialSize */2],
+                    /* size */state[/* size */3],
                     /* documentCursor */state[/* documentCursor */4]
                   ];
           } else if (action.tag) {
             return /* record */[
                     /* dragging */state[/* dragging */0],
-                    /* initialX */state[/* initialX */1],
-                    /* initialWidth */state[/* initialWidth */2],
-                    /* width */Utils$ReactHooksTemplate.clamp(minWidth, maxWidth, (state[/* initialWidth */2] + state[/* initialX */1] | 0) - action[0] | 0),
+                    /* initialMousePosition */state[/* initialMousePosition */1],
+                    /* initialSize */state[/* initialSize */2],
+                    /* size */Utils$ReactHooksTemplate.clamp(minSize, maxSize, (state[/* initialSize */2] + state[/* initialMousePosition */1] | 0) - action[0] | 0),
                     /* documentCursor */state[/* documentCursor */4]
                   ];
           } else {
             var optionCurrent = paneRef.current;
+            var tmp;
+            if (optionCurrent == null) {
+              tmp = 0;
+            } else {
+              var match = direction === "horizontal";
+              tmp = match ? optionCurrent.clientWidth : optionCurrent.clientHeight;
+            }
             return /* record */[
                     /* dragging */true,
-                    /* initialX */action[0],
-                    /* initialWidth */(optionCurrent == null) ? 0 : optionCurrent.clientWidth,
-                    /* width */state[/* width */3],
+                    /* initialMousePosition */action[0],
+                    /* initialSize */tmp,
+                    /* size */state[/* size */3],
                     /* documentCursor */state[/* documentCursor */4]
                   ];
           }
         }), initialState);
-  var dispatch = match$2[1];
-  var state = match$2[0];
+  var dispatch = match$5[1];
+  var state = match$5[0];
   React.useEffect((function (param) {
           if (state[/* dragging */0]) {
             var onUp = function (_e) {
-              callOnDrag(onDragEnd, state[/* width */3]);
+              callOnDrag(onDragEnd, state[/* size */3]);
               return Curry._1(dispatch, /* MouseUp */0);
             };
             var onMove = function (e) {
-              callOnDrag(onDrag, state[/* width */3]);
+              callOnDrag(onDrag, state[/* size */3]);
               Utils$ReactHooksTemplate.clearSelection(/* () */0);
-              return Curry._1(dispatch, /* MouseMove */Block.__(1, [e.pageX]));
+              var match = direction === "horizontal";
+              var position = match ? e.pageX : e.pageY;
+              return Curry._1(dispatch, /* MouseMove */Block.__(1, [position]));
             };
             $$document.addEventListener("mousemove", onMove);
             $$document.addEventListener("mouseup", onUp);
@@ -91,29 +105,37 @@ function Split(Props) {
         state[/* dragging */0],
         state[/* documentCursor */4],
         dispatch,
-        state[/* width */3]
+        state[/* size */3]
       ]);
   var onMouseDown = React.useCallback((function (e) {
-          callOnDrag(onDragStart, state[/* width */3]);
+          callOnDrag(onDragStart, state[/* size */3]);
           Utils$ReactHooksTemplate.clearSelection(/* () */0);
-          return Curry._1(dispatch, /* MouseDown */Block.__(0, [e.pageX]));
+          var match = direction === "horizontal";
+          var position = match ? e.pageX : e.pageY;
+          return Curry._1(dispatch, /* MouseDown */Block.__(0, [position]));
         }), /* tuple */[
         dispatch,
-        state[/* width */3]
+        state[/* size */3]
       ]);
-  var finalWidth = width !== undefined ? String(width) + "px" : String(state[/* width */3]) + "px";
-  var match$3 = state[/* dragging */0];
-  var joinedClassNames = match$3 ? className + (" " + classNameDragging) : className;
+  var finalSize = size !== undefined ? String(size) + "px" : String(state[/* size */3]) + "px";
+  var match$6 = direction === "horizontal";
+  var baseClassName = match$6 ? className + (" " + classNameHorizontal) : className + (" " + classNameVertical);
+  var match$7 = state[/* dragging */0];
+  var joinedClassNames = match$7 ? baseClassName + (" " + classNameDragging) : baseClassName;
+  var sizeStyle = direction === "horizontal" ? ({
+        width: finalSize,
+        flex: "unset"
+      }) : ({
+        height: finalSize,
+        flex: "unset"
+      });
   return React.createElement("div", {
               className: joinedClassNames
             }, React.createElement("div", undefined, React.createElement("div", undefined, children[0])), React.createElement("div", {
                   onMouseDown: onMouseDown
                 }), React.createElement("div", {
                   ref: paneRef,
-                  style: {
-                    width: finalWidth,
-                    flex: "unset"
-                  }
+                  style: sizeStyle
                 }, React.createElement("div", undefined, children[1])));
 }
 

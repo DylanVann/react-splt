@@ -3,17 +3,17 @@ open Webapi.Dom.EventTarget;
 
 type state = {
   dragging: bool,
-  initialX: int,
-  initialWidth: int,
-  width: int,
+  initialMousePosition: int,
+  initialSize: int,
+  size: int,
   documentCursor: option(string),
 };
 
 let initialState: state = {
   dragging: false,
-  initialX: 0,
-  initialWidth: 0,
-  width: 100,
+  initialMousePosition: 0,
+  initialSize: 0,
+  size: 100,
   documentCursor: None,
 };
 
@@ -32,24 +32,22 @@ let callOnDrag = (onDrag, size) =>
   | None => ()
   };
 
-type direction =
-  | Horizontal
-  | Vertical;
-
 [@react.component]
 [@genType]
 let make =
     (
-      ~width: option(int)=?,
-      ~minWidth: option(int)=?,
-      ~maxWidth: option(int)=?,
+      ~size: option(int)=?,
+      ~minSize: option(int)=?,
+      ~maxSize: option(int)=?,
       ~children: (ReasonReact.reactElement, ReasonReact.reactElement),
       ~onDragStart: option(callback)=?,
       ~onDrag: option(callback)=?,
       ~onDragEnd: option(callback)=?,
-      ~direction=Horizontal,
+      ~direction="horizontal",
       ~className="splitterer",
       ~classNameDragging="splitterer--dragging",
+      ~classNameVertical="splitterer--vertical",
+      ~classNameHorizontal="splitterer--horizontal",
     ) => {
   let paneRef: React.Ref.t(Js.Nullable.t(Webapi.Dom.Element.t)) =
     React.useRef(Js.Nullable.null);
@@ -60,23 +58,26 @@ let make =
         | MouseDown(x) => {
             ...state,
             dragging: true,
-            initialX: x,
-            initialWidth: {
+            initialMousePosition: x,
+            initialSize: {
               let optionCurrent =
                 Js.Nullable.toOption(React.Ref.current(paneRef));
               switch (optionCurrent) {
-              | Some(current) => Webapi.Dom.Element.clientWidth(current)
+              | Some(current) =>
+                direction == "horizontal"
+                  ? Webapi.Dom.Element.clientWidth(current)
+                  : Webapi.Dom.Element.clientHeight(current)
               | None => 0
               };
             },
           }
         | MouseMove(x) => {
             ...state,
-            width:
+            size:
               Utils.clamp(
-                minWidth,
-                maxWidth,
-                state.initialWidth + state.initialX - x,
+                minSize,
+                maxSize,
+                state.initialSize + state.initialMousePosition - x,
               ),
           }
         | MouseUp => {...state, dragging: false}
@@ -88,13 +89,14 @@ let make =
     () =>
       if (state.dragging) {
         let onUp = _e => {
-          callOnDrag(onDragEnd, state.width);
+          callOnDrag(onDragEnd, state.size);
           dispatch(MouseUp);
         };
         let onMove = (e: Dom.mouseEvent) => {
-          callOnDrag(onDrag, state.width);
+          callOnDrag(onDrag, state.size);
           Utils.clearSelection();
-          dispatch(MouseMove(pageX(e)));
+          let position = direction == "horizontal" ? pageX(e) : pageY(e);
+          dispatch(MouseMove(position));
         };
         addMouseMoveEventListener(onMove, document);
         addMouseUpEventListener(onUp, document);
@@ -107,37 +109,48 @@ let make =
       } else {
         None;
       },
-    (state.dragging, state.documentCursor, dispatch, state.width),
+    (state.dragging, state.documentCursor, dispatch, state.size),
   );
 
   let onMouseDown =
     React.useCallback2(
       e => {
-        callOnDrag(onDragStart, state.width);
+        callOnDrag(onDragStart, state.size);
         Utils.clearSelection();
-        dispatch(MouseDown(ReactEvent.Mouse.pageX(e)));
+        let position =
+          direction == "horizontal"
+            ? ReactEvent.Mouse.pageX(e) : ReactEvent.Mouse.pageY(e);
+        dispatch(MouseDown(position));
       },
-      (dispatch, state.width),
+      (dispatch, state.size),
     );
 
-  let finalWidth =
-    switch (width) {
-    | Some(width) => string_of_int(width) ++ "px"
-    | None => string_of_int(state.width) ++ "px"
+  let finalSize =
+    switch (size) {
+    | Some(size) => string_of_int(size) ++ "px"
+    | None => string_of_int(state.size) ++ "px"
     };
 
   let refForJsx = ReactDOMRe.Ref.domRef(paneRef);
 
+  let baseClassName =
+    direction == "horizontal"
+      ? className ++ " " ++ classNameHorizontal
+      : className ++ " " ++ classNameVertical;
+
   let joinedClassNames =
-    state.dragging ? className ++ " " ++ classNameDragging : className;
+    state.dragging ? baseClassName ++ " " ++ classNameDragging : baseClassName;
+
+  let sizeStyle =
+    if (direction == "horizontal") {
+      ReactDOMRe.Style.make(~width=finalSize, ~flex="unset", ());
+    } else {
+      ReactDOMRe.Style.make(~height=finalSize, ~flex="unset", ());
+    };
 
   <div className=joinedClassNames>
     <div> <div> {fst(children)} </div> </div>
     <div onMouseDown />
-    <div
-      ref=refForJsx
-      style={ReactDOMRe.Style.make(~width=finalWidth, ~flex="unset", ())}>
-      <div> {snd(children)} </div>
-    </div>
+    <div ref=refForJsx style=sizeStyle> <div> {snd(children)} </div> </div>
   </div>;
 };
