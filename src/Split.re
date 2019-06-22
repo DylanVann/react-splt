@@ -106,10 +106,23 @@ let make =
         };
         addMouseMoveEventListener(onMove, document);
         addMouseUpEventListener(onUp, document);
+
+        let onTouchMove: Dom.touchEvent => unit = [%bs.raw
+          {|e => onMove(e.touches[0]) |}
+        ];
+
+        let onTouchEnd: Dom.touchEvent => unit = [%bs.raw
+          {|e => onUp(e.touches[0]) |}
+        ];
+
+        addTouchMoveEventListener(onTouchMove, document);
+        addTouchEndEventListener(onTouchEnd, document);
         Some(
           () => {
             removeMouseMoveEventListener(onMove, document);
             removeMouseUpEventListener(onUp, document);
+            removeTouchMoveEventListener(onTouchMove, document);
+            removeTouchEndEventListener(onTouchEnd, document);
           },
         );
       } else {
@@ -130,6 +143,10 @@ let make =
       },
       (dispatch, state.size),
     );
+
+  let onTouchStart: ReactEvent.Touch.t => unit = [%bs.raw
+    {|e => onMouseDown(e.touches[0]) |}
+  ];
 
   let finalSize =
     switch (size) {
@@ -158,7 +175,7 @@ let make =
 
   <div className=joinedClassNames>
     <div> <div> {fst(children)} </div> </div>
-    <div onMouseDown />
+    <div onMouseDown onTouchStart />
     <div ref=refForJsx style=sizeStyle> <div> {snd(children)} </div> </div>
   </div>;
 };

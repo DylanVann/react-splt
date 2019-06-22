@@ -98,9 +98,15 @@ function Split(Props) {
             };
             $$document.addEventListener("mousemove", onMove);
             $$document.addEventListener("mouseup", onUp);
+            var onTouchMove = (e => onMove(e.touches[0]) );
+            var onTouchEnd = (e => onUp(e.touches[0]) );
+            $$document.addEventListener("touchmove", onTouchMove);
+            $$document.addEventListener("touchend", onTouchEnd);
             return (function (param) {
                       $$document.removeEventListener("mousemove", onMove);
                       $$document.removeEventListener("mouseup", onUp);
+                      $$document.removeEventListener("touchmove", onTouchMove);
+                      $$document.removeEventListener("touchend", onTouchEnd);
                       return /* () */0;
                     });
           }
@@ -121,6 +127,7 @@ function Split(Props) {
         dispatch,
         state[/* size */3]
       ]);
+  var onTouchStart = (e => onMouseDown(e.touches[0]) );
   var finalSize = size !== undefined ? String(size) + "px" : String(state[/* size */3]) + "px";
   var match$6 = direction === "horizontal";
   var baseClassName = match$6 ? className + (" " + classNameHorizontal) : className + (" " + classNameVertical);
@@ -140,7 +147,8 @@ function Split(Props) {
   return React.createElement("div", {
               className: joinedClassNames
             }, React.createElement("div", undefined, React.createElement("div", undefined, children[0])), React.createElement("div", {
-                  onMouseDown: onMouseDown
+                  onMouseDown: onMouseDown,
+                  onTouchStart: onTouchStart
                 }), React.createElement("div", {
                   ref: paneRef,
                   style: sizeStyle
