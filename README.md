@@ -1,4 +1,4 @@
-# [React Splt](https://react-splt.netlify.com/?path=/story/splitterer--basic-example)
+# [React Splt](https://react-splt.netlify.com/?path=/story/splitterer--basic-example) · ![npm bundle size](https://img.shields.io/bundlephobia/minzip/react-splt.svg?style=flat-square)
 
 A tiny (1kb) React component for split panes (written in ReasonML).
 
