@@ -9,7 +9,7 @@ yarn add react-splt
 ```
 
 ```jsx
-import { Split } from 'react-splt'
+import Split from 'react-splt'
 
 function MyComponent() {
     return (
