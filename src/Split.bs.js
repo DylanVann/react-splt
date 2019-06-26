@@ -10,8 +10,7 @@ var initialState = /* record */[
   /* initialMousePosition */0,
   /* initialSize */0,
   /* size */0,
-  /* measured */false,
-  /* documentCursor */undefined
+  /* measured */false
 ];
 
 var $$document = document;
@@ -35,13 +34,13 @@ function Split(Props) {
   var match = Props.direction;
   var direction = match !== undefined ? match : "horizontal";
   var match$1 = Props.className;
-  var className = match$1 !== undefined ? match$1 : "splitterer";
+  var className = match$1 !== undefined ? match$1 : "splt";
   var match$2 = Props.classNameDragging;
-  var classNameDragging = match$2 !== undefined ? match$2 : "splitterer--dragging";
+  var classNameDragging = match$2 !== undefined ? match$2 : "splt--d";
   var match$3 = Props.classNameVertical;
-  var classNameVertical = match$3 !== undefined ? match$3 : "splitterer--vertical";
+  var classNameVertical = match$3 !== undefined ? match$3 : "splt--v";
   var match$4 = Props.classNameHorizontal;
-  var classNameHorizontal = match$4 !== undefined ? match$4 : "splitterer--horizontal";
+  var classNameHorizontal = match$4 !== undefined ? match$4 : "splt--h";
   var paneRef = React.useRef(null);
   var match$5 = React.useReducer((function (state, action) {
           if (typeof action === "number") {
@@ -50,8 +49,7 @@ function Split(Props) {
                     /* initialMousePosition */state[/* initialMousePosition */1],
                     /* initialSize */state[/* initialSize */2],
                     /* size */state[/* size */3],
-                    /* measured */state[/* measured */4],
-                    /* documentCursor */state[/* documentCursor */5]
+                    /* measured */state[/* measured */4]
                   ];
           } else if (action.tag) {
             return /* record */[
@@ -59,8 +57,7 @@ function Split(Props) {
                     /* initialMousePosition */state[/* initialMousePosition */1],
                     /* initialSize */state[/* initialSize */2],
                     /* size */Utils$ReactHooksTemplate.clamp(minSize, maxSize, (state[/* initialSize */2] + state[/* initialMousePosition */1] | 0) - action[0] | 0),
-                    /* measured */state[/* measured */4],
-                    /* documentCursor */state[/* documentCursor */5]
+                    /* measured */state[/* measured */4]
                   ];
           } else {
             var optionCurrent = paneRef.current;
@@ -76,8 +73,7 @@ function Split(Props) {
                     /* initialMousePosition */action[0],
                     /* initialSize */initialSize,
                     /* size */initialSize,
-                    /* measured */true,
-                    /* documentCursor */state[/* documentCursor */5]
+                    /* measured */true
                   ];
           }
         }), initialState);
@@ -113,7 +109,6 @@ function Split(Props) {
           
         }), /* tuple */[
         state[/* dragging */0],
-        state[/* documentCursor */5],
         dispatch,
         state[/* size */3]
       ]);

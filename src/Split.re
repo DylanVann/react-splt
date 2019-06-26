@@ -7,7 +7,6 @@ type state = {
   initialSize: int,
   size: int,
   measured: bool,
-  documentCursor: option(string),
 };
 
 let initialState: state = {
@@ -16,7 +15,6 @@ let initialState: state = {
   initialSize: 0,
   size: 0,
   measured: false,
-  documentCursor: None,
 };
 
 type action =
@@ -46,10 +44,10 @@ let make =
       ~onDrag: option(callback)=?,
       ~onDragEnd: option(callback)=?,
       ~direction="horizontal",
-      ~className="splitterer",
-      ~classNameDragging="splitterer--dragging",
-      ~classNameVertical="splitterer--vertical",
-      ~classNameHorizontal="splitterer--horizontal",
+      ~className="splt",
+      ~classNameDragging="splt--d",
+      ~classNameVertical="splt--v",
+      ~classNameHorizontal="splt--h",
     ) => {
   let paneRef: React.Ref.t(Js.Nullable.t(Webapi.Dom.Element.t)) =
     React.useRef(Js.Nullable.null);
@@ -70,7 +68,6 @@ let make =
             };
           };
           {
-            ...state,
             dragging: true,
             initialMousePosition: x,
             measured: true,
@@ -91,7 +88,7 @@ let make =
       initialState,
     );
 
-  React.useEffect4(
+  React.useEffect3(
     () =>
       if (state.dragging) {
         let onUp = _e => {
@@ -128,7 +125,7 @@ let make =
       } else {
         None;
       },
-    (state.dragging, state.documentCursor, dispatch, state.size),
+    (state.dragging, dispatch, state.size),
   );
 
   let onMouseDown =
