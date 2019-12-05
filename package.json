@@ -16,7 +16,7 @@
         "index.css"
     ],
     "main": "dist/index.js",
-    "module": "dist/index.mjs",
+    "module": "dist/index.module.js",
     "sideEffects": false,
     "source": "src/Split.bs.js",
     "types": "src/index.d.ts",
