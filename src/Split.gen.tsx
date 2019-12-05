@@ -8,7 +8,8 @@ const SplitBS = require('./Split.bs');
 // tslint:disable-next-line:interface-over-type-literal
 export type callback = (_1:number) => void;
 
-export const make: (_1:{
+// tslint:disable-next-line:interface-over-type-literal
+export type Props = {
   readonly children: [JSX.Element, JSX.Element]; 
   readonly className?: string; 
   readonly classNameDragging?: string; 
@@ -21,4 +22,19 @@ export const make: (_1:{
   readonly onDragEnd?: callback; 
   readonly onDragStart?: callback; 
   readonly size?: number
-}) => JSX.Element = SplitBS.make;
+};
+
+export const make: React.ComponentType<{
+  readonly children: [JSX.Element, JSX.Element]; 
+  readonly className?: string; 
+  readonly classNameDragging?: string; 
+  readonly classNameHorizontal?: string; 
+  readonly classNameVertical?: string; 
+  readonly direction?: string; 
+  readonly maxSize?: number; 
+  readonly minSize?: number; 
+  readonly onDrag?: callback; 
+  readonly onDragEnd?: callback; 
+  readonly onDragStart?: callback; 
+  readonly size?: number
+}> = SplitBS.make;
